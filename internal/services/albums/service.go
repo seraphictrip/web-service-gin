@@ -3,10 +3,12 @@ package albums
 import (
 	"errors"
 	"example/web-service-gin/internal/models"
+	"example/web-service-gin/internal/repositories"
 )
 
 var (
-	ErrNotFound = errors.New("not found")
+	ErrNotFound        = errors.New("not found")
+	ErrInternalService = errors.New("internal service erro")
 )
 
 type AlbumsService interface {
@@ -16,33 +18,31 @@ type AlbumsService interface {
 }
 
 type svc struct {
-	// TODO: hook up a repository
+	repo repositories.AlbumsRepository
 }
 
-func NewAlbumsService() *svc {
-	return &svc{}
+func NewAlbumsService(repo repositories.AlbumsRepository) *svc {
+	return &svc{repo}
 }
 func (s *svc) Get() ([]models.Album, error) {
-	return albums, nil
+	// TODO: if repo can throw eror we should trap and convert to business appropriate error
+	return s.repo.Get()
 }
 
 func (s *svc) Create(newAlbum models.Album) error {
-	albums = append(albums, newAlbum)
-	return nil
+	// TODO: if repo can throw eror we should trap and convert to business appropriate error
+	err := s.repo.Create(newAlbum)
+	return err
 }
 
 func (s *svc) GetById(id string) (album models.Album, err error) {
-	for _, a := range albums {
-		if a.ID == id {
-
-			return a, nil
+	album, err = s.repo.GetById(id)
+	if err != nil {
+		if errors.Is(err, repositories.ErrNotFound) {
+			err = ErrNotFound
+		} else {
+			err = ErrInternalService
 		}
 	}
-	return album, ErrNotFound
-}
-
-var albums = []models.Album{
-	{ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
-	{ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
-	{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
+	return album, err
 }
