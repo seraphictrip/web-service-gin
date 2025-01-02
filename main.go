@@ -2,6 +2,7 @@ package main
 
 import (
 	"example/web-service-gin/internal/handlers"
+	"example/web-service-gin/internal/middleware"
 	"example/web-service-gin/internal/repositories"
 	albums_svc "example/web-service-gin/internal/services/albums"
 
@@ -10,6 +11,11 @@ import (
 
 func main() {
 	router := gin.Default()
+
+	// basic middleware
+	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
+	router.Use(middleware.SimpleMiddleware())
 
 	albumRepo := repositories.NewAlbumsRepository()
 	albumsService := albums_svc.NewAlbumsService(albumRepo)
