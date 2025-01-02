@@ -68,8 +68,15 @@ func (h *Handler) GetAlbumById(c *gin.Context) {
 
 }
 
-func GetPath(c *gin.Context) {
-	path := c.Param("path")
+func (h *Handler) RegisterRoutes(router *gin.RouterGroup) {
+	router.GET("/", h.GetAlbums)
+	router.POST("/", h.PostAlbums)
 
-	c.IndentedJSON(http.StatusOK, gin.H{"path": path})
+	router.GET("/:id", h.GetAlbumById)
 }
+
+// func GetPath(c *gin.Context) {
+// 	path := c.Param("path")
+
+// 	c.IndentedJSON(http.StatusOK, gin.H{"path": path})
+// }

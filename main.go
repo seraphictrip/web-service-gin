@@ -16,10 +16,8 @@ func main() {
 	albumsHandlers := handlers.NewAlbumsHandler(albumsService)
 
 	// Albums
-	router.GET("/albums", albumsHandlers.GetAlbums)
-	router.POST("/albums", albumsHandlers.PostAlbums)
-
-	router.GET("/albums/:id", albumsHandlers.GetAlbumById)
+	albums := router.Group("/albums")
+	albumsHandlers.RegisterRoutes(albums)
 
 	router.Run("localhost:8080")
 }
